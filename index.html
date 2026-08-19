@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#070a12" />
     <meta
       name="description"
-      content="Rishi AI BOT1 — a private Qwen3 1.7B assistant that runs directly in your browser with WebGPU."
+      content="Rishi AI BOT1 — a private Qwen3 assistant that runs directly in your browser with WebGPU and adaptive model fallback."
     />
     <title>Rishi AI BOT1 — Private Browser AI</title>
   </head>
@@ -39,12 +39,16 @@
         </div>
 
         <div class="model-card">
-          <div class="eyebrow">MODEL</div>
-          <div class="model-title">Qwen3 1.7B</div>
-          <div class="model-meta">WebLLM · q4f16 · WebGPU</div>
+          <div class="eyebrow">ADAPTIVE MODEL</div>
+          <div id="model-title" class="model-title">Qwen3 1.7B</div>
+          <div id="model-meta" class="model-meta">WebLLM · q4f16 · WebGPU</div>
           <div class="model-stat-row">
             <span>Approx. VRAM</span>
-            <strong>~2.0 GB</strong>
+            <strong id="model-vram">~2.0 GB</strong>
+          </div>
+          <div class="model-stat-row">
+            <span>Fallback</span>
+            <strong>Qwen3 0.6B</strong>
           </div>
           <div class="model-stat-row">
             <span>Context</span>
@@ -87,8 +91,9 @@
             <div class="eyebrow">YOUR DEVICE. YOUR MODEL. YOUR CHAT.</div>
             <h2>Private AI, right in your browser.</h2>
             <p>
-              Load Qwen3 once, then chat with WebGPU acceleration. The model is
-              cached by your browser for faster future starts.
+              Rishi AI checks your WebGPU capabilities, tries Qwen3 1.7B first,
+              and automatically falls back to a lighter Qwen3 profile when needed.
+              Model files are cached by your browser for faster future starts.
             </p>
 
             <button id="load-model" class="primary-button" type="button">
@@ -110,7 +115,7 @@
             <div class="hero-notes">
               <span>◉ No API key</span>
               <span>◉ No prompt upload</span>
-              <span>◉ WebGPU accelerated</span>
+              <span>◉ Adaptive WebGPU</span>
             </div>
           </section>
         </div>
@@ -135,7 +140,7 @@
             </div>
           </form>
           <p class="footnote">
-            First load downloads the model from Hugging Face. Chat inference itself runs locally in your browser.
+            First load downloads a compatible Qwen3 model from Hugging Face. Chat inference itself runs locally in your browser.
           </p>
         </div>
       </section>
