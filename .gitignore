@@ -1,0 +1,21 @@
+# AI Model Files
+*.gguf
+*.ggml
+*.bin
+
+# Llamafile executable
+llamafile*.exe
+llamafile*
+
+# Logs / temporary files
+*.log
+*.tmp
+*.temp
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# IDE
+.vscode/
+.idea/
