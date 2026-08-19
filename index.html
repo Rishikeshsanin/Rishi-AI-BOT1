@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070a12" />
+    <meta
+      name="description"
+      content="Rishi AI BOT1 — a private Qwen3 1.7B assistant that runs directly in your browser with WebGPU."
+    />
+    <title>Rishi AI BOT1 — Private Browser AI</title>
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <a class="brand" href="#" aria-label="Rishi AI BOT1 home">
+            <span class="brand-mark">R</span>
+            <span>
+              <strong>Rishi AI</strong>
+              <small>BOT1</small>
+            </span>
+          </a>
+
+          <div class="privacy-card">
+            <div class="privacy-icon">◆</div>
+            <div>
+              <strong>Private by design</strong>
+              <p>Inference runs on your device. No API key and no chat server.</p>
+            </div>
+          </div>
+
+          <button id="new-chat" class="side-button" type="button">
+            <span>＋</span> New chat
+          </button>
+        </div>
+
+        <div class="model-card">
+          <div class="eyebrow">MODEL</div>
+          <div class="model-title">Qwen3 1.7B</div>
+          <div class="model-meta">WebLLM · q4f16 · WebGPU</div>
+          <div class="model-stat-row">
+            <span>Approx. VRAM</span>
+            <strong>~2.0 GB</strong>
+          </div>
+          <div class="model-stat-row">
+            <span>Context</span>
+            <strong>4K</strong>
+          </div>
+        </div>
+
+        <a
+          class="github-link"
+          href="https://github.com/Rishikeshsanin/Rishi-AI-BOT1"
+          target="_blank"
+          rel="noreferrer"
+        >
+          View source on GitHub ↗
+        </a>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">LOCAL-FIRST AI</div>
+            <h1>Rishi AI BOT1</h1>
+          </div>
+          <div class="top-actions">
+            <label class="thinking-control" title="Enable Qwen3 reasoning mode">
+              <span>Think</span>
+              <input id="thinking-toggle" type="checkbox" />
+              <span class="switch"></span>
+            </label>
+            <div id="status-pill" class="status-pill idle">
+              <span class="status-dot"></span>
+              <span id="status-text">Model not loaded</span>
+            </div>
+          </div>
+        </header>
+
+        <div id="chat" class="chat" aria-live="polite">
+          <section id="hero" class="hero">
+            <div class="hero-orb"><span>R</span></div>
+            <div class="eyebrow">YOUR DEVICE. YOUR MODEL. YOUR CHAT.</div>
+            <h2>Private AI, right in your browser.</h2>
+            <p>
+              Load Qwen3 once, then chat with WebGPU acceleration. The model is
+              cached by your browser for faster future starts.
+            </p>
+
+            <button id="load-model" class="primary-button" type="button">
+              <span class="button-glow"></span>
+              <span id="load-button-label">Load Rishi AI</span>
+              <span>→</span>
+            </button>
+
+            <div id="progress-wrap" class="progress-wrap hidden">
+              <div class="progress-track">
+                <div id="progress-bar" class="progress-bar"></div>
+              </div>
+              <div class="progress-copy">
+                <span id="progress-text">Preparing model…</span>
+                <span id="progress-percent">0%</span>
+              </div>
+            </div>
+
+            <div class="hero-notes">
+              <span>◉ No API key</span>
+              <span>◉ No prompt upload</span>
+              <span>◉ WebGPU accelerated</span>
+            </div>
+          </section>
+        </div>
+
+        <div class="composer-wrap">
+          <form id="composer" class="composer">
+            <textarea
+              id="prompt"
+              rows="1"
+              maxlength="6000"
+              placeholder="Load the model to start chatting…"
+              disabled
+            ></textarea>
+            <div class="composer-footer">
+              <div class="composer-hint">
+                <span id="device-indicator">Checking WebGPU…</span>
+              </div>
+              <div class="composer-actions">
+                <button id="stop-button" class="icon-button hidden" type="button" title="Stop generation">■</button>
+                <button id="send-button" class="send-button" type="submit" disabled aria-label="Send message">↑</button>
+              </div>
+            </div>
+          </form>
+          <p class="footnote">
+            First load downloads the model from Hugging Face. Chat inference itself runs locally in your browser.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
