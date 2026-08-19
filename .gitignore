@@ -7,6 +7,11 @@
 llamafile*.exe
 llamafile*
 
+# Web dependencies and builds
+node_modules/
+dist/
+.vercel/
+
 # Logs / temporary files
 *.log
 *.tmp
