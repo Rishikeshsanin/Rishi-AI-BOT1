@@ -1,297 +1,266 @@
-<div align="center">
+<p align="center">
+  <img src="assets/rishi-ai-banner.svg" alt="Rishi AI BOT1 banner" width="100%" />
+</p>
 
-# 🤖 Rishi AI BOT1
+<p align="center">
+  <a href="https://rishi-ai-bot1.vercel.app"><img src="https://img.shields.io/badge/LIVE_DEMO-OPEN_APP-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white" alt="Live demo" /></a>
+  <a href="https://github.com/Rishikeshsanin/Rishi-AI-BOT1/actions"><img src="https://img.shields.io/github/actions/workflow/status/Rishikeshsanin/Rishi-AI-BOT1/ci.yml?branch=main&style=for-the-badge&label=BUILD" alt="Build" /></a>
+  <img src="https://img.shields.io/badge/LICENSE-MIT-22C55E?style=for-the-badge" alt="MIT License" />
+</p>
 
-### One AI project. Two private ways to run it.
-
-**Qwen3 1.7B · Local Llamafile · Browser WebGPU · No Cloud Inference API · No API Key**
-
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-rishi--ai--bot1.vercel.app-8b5cf6?style=for-the-badge&logo=vercel&logoColor=white)](https://rishi-ai-bot1.vercel.app)
-
-![Model](https://img.shields.io/badge/model-Qwen3%201.7B-7c3aed)
-![Browser Runtime](https://img.shields.io/badge/browser-WebLLM-06b6d4)
-![Local Runtime](https://img.shields.io/badge/local-Llamafile-f97316)
-![License](https://img.shields.io/badge/license-MIT-blue)
-
-</div>
+<p align="center">
+  <strong>Qwen3 · WebLLM · WebGPU · Llamafile · Vite · Vercel</strong><br />
+  One project, two local-first ways to run AI.
+</p>
 
 ---
 
-## ✨ What is Rishi AI BOT1?
+## Overview
 
-Rishi AI BOT1 is a local-first AI assistant built around **Qwen3 1.7B**.
+**Rishi AI BOT1** is a local-first AI assistant built to explore private on-device inference without depending on a paid cloud inference API.
 
-It now has two execution modes:
+It supports two modes:
 
-1. **Live browser mode** — the website is hosted on Vercel, but Qwen inference runs inside the visitor's browser through **WebLLM + WebGPU**.
-2. **Windows offline mode** — a GGUF model runs locally through **Llamafile** in CPU compatibility mode.
+| Mode | Runtime | Model | Best for |
+|---|---|---|---|
+| **Web demo** | WebLLM + WebGPU | Qwen3 1.7B with lighter fallback | Easy portfolio/demo access |
+| **Windows offline** | Llamafile + CPU | Qwen3 1.7B `Q4_K_M` GGUF | Reliable fully local use |
 
-The project does not require an OpenAI, Gemini, Anthropic, or other hosted inference API key.
+> **Note:** the browser version is experimental and hardware-sensitive. It can be slower or fail to initialize on some GPUs/drivers. The Windows Llamafile mode is the more predictable local option.
 
-## 🌐 Live demo
+## Live demo
 
-### https://rishi-ai-bot1.vercel.app
+### **https://rishi-ai-bot1.vercel.app**
 
-The live version intentionally does **not** run the model on a Vercel server. Vercel serves the frontend; the model is downloaded to and executed on the visitor's device.
+Vercel hosts the frontend, while the browser version is designed to run inference on the visitor's device through WebGPU rather than through a Rishi AI backend inference API.
+
+The browser build:
+
+- checks WebGPU support
+- attempts the preferred Qwen3 profile
+- falls back to a lighter Qwen3 profile when required
+- streams generated text
+- supports a thinking-mode toggle
+- keeps chat history in browser storage
+- requires no hosted inference API key
 
 ### Browser requirements
 
-- A recent browser with WebGPU support — Chrome or Edge recommended
-- Roughly **2 GB of available GPU memory** for the selected WebLLM Qwen3 build
-- Internet access for the initial page/model download
+- Recent Chrome/Edge or another browser with working WebGPU support
+- Hardware acceleration enabled
+- Sufficient available GPU memory
+- Internet access for the initial site/model download
 
-The browser can cache model artifacts, making later model starts faster.
+Model artifacts may be cached by the browser after the first load.
 
-## 🚀 Web features
+## Windows offline mode
 
-- 🧠 Qwen3 1.7B browser inference
-- ⚡ WebGPU acceleration
-- 🔒 Prompts stay in the browser during inference
-- 🔑 No inference API key
-- 💬 Streaming responses
-- 🧩 Qwen3 thinking-mode toggle
-- ⏹️ Stop generation control
-- 💾 Local browser chat history
-- 📱 Responsive desktop/mobile UI
-- 📊 Model loading progress
-- 🧵 Web Worker inference to keep the interface responsive
-
-## 🖥️ Local Windows features
-
-- 📴 Fully local operation after the required files are present
-- 📦 Qwen3 1.7B `Q4_K_M` GGUF
-- ⚙️ CPU-only compatibility profile
-- 🖱️ One-click `start.bat`
-- 🌐 Local chat server at `127.0.0.1:8081`
-- 🚫 Model/runtime binaries excluded from GitHub
-
-## 🧩 Architecture
-
-### Browser / deployed mode
-
-```mermaid
-flowchart LR
-    U[User] --> V[Vercel-hosted UI]
-    V --> W[Web Worker]
-    W --> L[WebLLM]
-    L --> Q[Qwen3 1.7B q4f16]
-    Q --> G[Browser WebGPU]
-    G --> L
-    L --> V
-```
-
-### Local Windows mode
-
-```mermaid
-flowchart LR
-    U[User] --> B[Browser UI]
-    B -->|127.0.0.1:8081| L[Llamafile Server]
-    L --> Q[Qwen3 1.7B Q4_K_M GGUF]
-    Q --> C[CPU / System RAM]
-    C --> L
-    L --> B
-```
-
-## 📁 Project structure
+The local version runs a quantized Qwen3 GGUF model through Llamafile and is configured for CPU compatibility.
 
 ```text
-Rishi-AI-BOT1/
-├── src/
-│   ├── main.js             # Web chat + WebLLM integration
-│   ├── style.css           # Responsive UI
-│   └── worker.js           # WebLLM Web Worker
-├── .gitattributes
-├── .gitignore
-├── CHANGELOG.md
-├── index.html              # Vite entry page
-├── LICENSE
-├── package.json            # Browser build dependencies
-├── README.md
-├── start.bat               # Windows local launcher
-│
-├── llamafile-0.10.5.exe    # local only — ignored by Git
-└── qwen3-1.7b-q4_k_m.gguf  # local only — ignored by Git
+Browser
+   │
+   │ 127.0.0.1:8081
+   ▼
+Llamafile
+   │
+   ▼
+Qwen3 1.7B Q4_K_M
+   │
+   ▼
+CPU + system RAM
 ```
 
-## 🌐 Run the web version locally
-
-Requirements: Node.js and npm.
-
-```bash
-git clone https://github.com/Rishikeshsanin/Rishi-AI-BOT1.git
-cd Rishi-AI-BOT1
-npm install
-npm run dev
-```
-
-Then open the local URL printed by Vite.
-
-For a production build:
-
-```bash
-npm run build
-```
-
-The output is written to `dist/`.
-
-## 📴 Run the fully local Windows version
-
-### 1. Clone the repository
+### Quick start
 
 ```bash
 git clone https://github.com/Rishikeshsanin/Rishi-AI-BOT1.git
 cd Rishi-AI-BOT1
 ```
 
-### 2. Add the runtime files
-
-Place these beside `start.bat`:
+Place these two local-only files beside `start.bat`:
 
 ```text
 llamafile-0.10.5.exe
 qwen3-1.7b-q4_k_m.gguf
 ```
 
-The large runtime/model files are intentionally not stored in this GitHub repository.
-
-### 3. Launch
-
-Double-click:
+Then double-click:
 
 ```text
 start.bat
 ```
 
-The launcher validates both files and starts:
+When the terminal reports that the server is listening, open:
 
 ```text
 http://127.0.0.1:8081
 ```
 
-Keep the terminal open while chatting.
-
-## 🛠️ Local launcher configuration
+The launcher intentionally uses:
 
 ```text
---server
---model qwen3-1.7b-q4_k_m.gguf
 --gpu disable
 --host 127.0.0.1
 --port 8081
 ```
 
-### Why CPU mode?
+CPU mode avoids the CUDA initialization problem encountered during development, and port `8081` avoids a local service conflict previously observed on `8080`.
 
-Automatic CUDA initialization failed on the original test system. The included launcher therefore forces CPU mode for predictable compatibility.
+## Web development
 
-### Why port 8081?
-
-The original setup encountered another Windows service occupying port `8080`, so this project defaults to `8081`.
-
-## 🩺 Troubleshooting
-
-### Live site says WebGPU unavailable
-
-Use an up-to-date Chromium-based browser and ensure hardware acceleration/WebGPU is available on the device.
-
-### Browser model fails to load
-
-The browser may not have enough available GPU memory. Close GPU-heavy tabs/apps and retry. Different hardware/browser combinations can expose different WebGPU limits.
-
-### Local mode shows `CUDA error`
-
-Confirm `start.bat` includes:
-
-```text
---gpu disable
+```bash
+npm install
+npm run dev
 ```
 
-### Local mode cannot bind the server socket
+Production build:
 
-Check whether port `8081` is occupied:
+```bash
+npm run build
+```
+
+The `main` branch is connected to Vercel for deployment, and GitHub Actions validates that the web build still succeeds.
+
+## Architecture
+
+### Browser mode
+
+```mermaid
+flowchart LR
+    U[User] --> V[Vercel frontend]
+    V --> W[Web Worker]
+    W --> L[WebLLM]
+    L --> Q[Qwen3]
+    Q --> G[WebGPU]
+    G --> L
+    L --> V
+```
+
+### Windows mode
+
+```mermaid
+flowchart LR
+    U[User] --> B[Local browser]
+    B -->|127.0.0.1:8081| L[Llamafile]
+    L --> Q[Qwen3 1.7B GGUF]
+    Q --> C[CPU / RAM]
+    C --> L
+    L --> B
+```
+
+For more detail, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Project structure
+
+```text
+Rishi-AI-BOT1/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── assets/
+│   └── rishi-ai-banner.svg
+├── docs/
+│   └── ARCHITECTURE.md
+├── src/
+│   ├── main.js
+│   ├── style.css
+│   └── worker.js
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── index.html
+├── LICENSE
+├── package.json
+├── README.md
+├── SECURITY.md
+└── start.bat
+```
+
+The following large files stay local and are ignored by Git:
+
+```text
+llamafile-0.10.5.exe
+qwen3-1.7b-q4_k_m.gguf
+```
+
+## Highlights
+
+- 🔒 Local-first inference design
+- 🧠 Qwen3-powered chat
+- ⚡ WebGPU browser acceleration
+- 🧵 Web Worker inference
+- 🔁 Adaptive browser model fallback
+- 💬 Streaming responses
+- 🧩 Thinking-mode toggle
+- 💾 Browser-local chat history
+- 📴 Fully local Windows mode
+- 🖱️ One-click Windows launcher
+- 🚫 No paid inference API required
+- ✅ GitHub Actions build validation
+- ▲ Vercel deployment
+
+## Troubleshooting
+
+**Browser model is slow**  
+Browser inference uses the visitor's own hardware. Close GPU-heavy apps/tabs or use the lighter fallback profile. The desktop Llamafile version may be a better fit for consistent use.
+
+**Browser model fails to load**  
+Use a current Chromium-based browser, confirm hardware acceleration is enabled, and check the exact error shown by the app. WebGPU availability alone does not guarantee that every model profile can initialize on every GPU.
+
+**Local mode shows a CUDA error**  
+Use the included CPU-only launcher and confirm `--gpu disable` is present.
+
+**Local server cannot bind the port**
 
 ```cmd
 netstat -ano | findstr :8081
 ```
 
-### Local browser says `Server unavailable`
+Close the conflicting process or change the local port.
 
-Wait until the terminal reports:
+## Privacy model
 
-```text
-listening on http://127.0.0.1:8081
-```
+**Web mode:** the site and model artifacts are downloaded over the internet, but chat inference is intended to run in the browser rather than through a project-owned inference backend.
 
-then refresh the page.
+**Windows mode:** Llamafile binds to `127.0.0.1`, keeping the server intended for same-device access.
 
-## 🔐 Privacy model
+Do not expose the Llamafile server publicly without authentication and proper network security controls.
 
-### Web deployment
+## Roadmap
 
-The website itself is delivered over the internet, and model artifacts are initially downloaded from the model host. **Inference is performed in the user's browser rather than by a Rishi AI BOT1 backend API.**
-
-### Windows deployment
-
-Llamafile binds to the loopback address `127.0.0.1`, keeping the local server intended for access from the same computer.
-
-Do not expose the Llamafile server publicly without adding appropriate authentication and network security controls.
-
-## 🧪 Tech stack
-
-| Component | Purpose |
-|---|---|
-| **Qwen3 1.7B** | Language model |
-| **WebLLM** | Browser-side LLM inference runtime |
-| **WebGPU** | Browser hardware acceleration |
-| **Web Worker** | Runs inference away from the main UI thread |
-| **Vite** | Web build tooling |
-| **Vercel** | Static web deployment |
-| **GGUF Q4_K_M** | Quantized local model format |
-| **Llamafile** | Windows local runtime + HTTP UI |
-| **Batch** | One-click local launcher |
-
-## ✅ Project status
-
-- [x] Qwen3 1.7B local GGUF inference
+- [x] Local Qwen3 GGUF inference
 - [x] CPU-only Windows launcher
 - [x] Branded browser frontend
-- [x] Qwen3 WebLLM integration
-- [x] Web Worker inference
+- [x] WebLLM + WebGPU integration
+- [x] Adaptive browser fallback
 - [x] Streaming chat
-- [x] Thinking-mode toggle
 - [x] Browser chat persistence
-- [x] Production Vite build
-- [x] Live Vercel deployment
-- [ ] Optional local GPU profile
+- [x] Vercel deployment
+- [x] GitHub Actions build check
+- [ ] Fast/Quality model selector
 - [ ] PWA/offline frontend shell
-- [ ] Model selector
-- [ ] Automated tests
+- [ ] Tokens-per-second metrics
+- [ ] Chat export/import
+- [ ] Automated browser smoke tests
 - [ ] Demo GIF/video
 
-## 🗺️ Roadmap
+## Contributing & security
 
-- Add installable PWA support
-- Add selectable lightweight models
-- Add generation controls
-- Add export/import chat
-- Add performance metrics such as tokens/second
-- Add optional local GPU launch profiles
-- Add automated browser smoke tests
+Contributions are welcome — see [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
-## 📜 License
+For security guidance, see [`SECURITY.md`](SECURITY.md).
 
-The original application code, launcher scripts, and documentation in this repository are released under the MIT License.
+## License
+
+The original application code, launcher scripts, and documentation in this repository are released under the **MIT License**.
 
 Qwen, WebLLM, Llamafile, model weights, and other third-party components remain governed by their respective licenses.
 
 ---
 
-<div align="center">
-
-**Built to explore private, local-first AI across desktop and the web.**
-
-[Open the live app](https://rishi-ai-bot1.vercel.app) · [View the source](https://github.com/Rishikeshsanin/Rishi-AI-BOT1)
-
-⭐ If you like the project, consider starring the repository.
-
-</div>
+<p align="center">
+  <strong>Built to explore private, local-first AI across the browser and desktop.</strong><br /><br />
+  <a href="https://rishi-ai-bot1.vercel.app">Live App</a> ·
+  <a href="docs/ARCHITECTURE.md">Architecture</a> ·
+  <a href="CONTRIBUTING.md">Contributing</a>
+</p>
