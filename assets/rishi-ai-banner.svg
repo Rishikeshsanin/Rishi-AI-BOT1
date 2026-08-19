@@ -1,0 +1,37 @@
+<svg width="1200" height="420" viewBox="0 0 1200 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="420" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#070A12"/>
+      <stop offset="0.52" stop-color="#11152A"/>
+      <stop offset="1" stop-color="#071722"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="180" y1="90" x2="1000" y2="330" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#22D3EE"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="28" result="blur"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="420" rx="28" fill="url(#bg)"/>
+  <circle cx="980" cy="80" r="180" fill="#7C3AED" opacity="0.16" filter="url(#glow)"/>
+  <circle cx="170" cy="360" r="170" fill="#0891B2" opacity="0.12" filter="url(#glow)"/>
+  <rect x="76" y="72" width="84" height="84" rx="24" fill="url(#accent)"/>
+  <text x="118" y="131" text-anchor="middle" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="44" font-weight="800" fill="white">R</text>
+  <text x="190" y="112" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="18" font-weight="700" letter-spacing="4" fill="#8FA0BE">LOCAL-FIRST AI</text>
+  <text x="190" y="174" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="54" font-weight="800" fill="white">Rishi AI BOT1</text>
+  <text x="78" y="238" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="24" fill="#B9C4D9">Private AI in your browser or fully offline on Windows.</text>
+  <g font-family="Inter,Segoe UI,Arial,sans-serif" font-size="16" font-weight="600">
+    <rect x="78" y="286" width="170" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.10"/>
+    <text x="163" y="316" text-anchor="middle" fill="#D7DEED">Qwen3</text>
+    <rect x="264" y="286" width="170" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.10"/>
+    <text x="349" y="316" text-anchor="middle" fill="#D7DEED">WebLLM</text>
+    <rect x="450" y="286" width="170" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.10"/>
+    <text x="535" y="316" text-anchor="middle" fill="#D7DEED">WebGPU</text>
+    <rect x="636" y="286" width="170" height="48" rx="24" fill="#FFFFFF" fill-opacity="0.06" stroke="#FFFFFF" stroke-opacity="0.10"/>
+    <text x="721" y="316" text-anchor="middle" fill="#D7DEED">Llamafile</text>
+    <rect x="822" y="286" width="220" height="48" rx="24" fill="url(#accent)" fill-opacity="0.18" stroke="#8B5CF6" stroke-opacity="0.35"/>
+    <text x="932" y="316" text-anchor="middle" fill="#EDE9FE">No cloud API key</text>
+  </g>
+  <text x="78" y="382" font-family="Inter,Segoe UI,Arial,sans-serif" font-size="14" fill="#667085">github.com/Rishikeshsanin/Rishi-AI-BOT1</text>
+</svg>
