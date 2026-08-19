@@ -2,6 +2,22 @@
 
 All notable changes to **Rishi AI BOT1** will be documented here.
 
+## [1.1.0] - 2026-08-19
+
+### Added
+
+- Production browser version powered by WebLLM + WebGPU
+- Qwen3 1.7B `q4f16` browser model profile
+- Branded responsive chat interface
+- Web Worker model execution
+- Streaming responses and stop-generation control
+- Qwen3 thinking-mode toggle
+- Browser-local chat history
+- Model loading progress and WebGPU capability checks
+- Vite production build
+- Live Vercel deployment at `https://rishi-ai-bot1.vercel.app`
+- Updated dual-mode architecture and deployment documentation
+
 ## [1.0.0] - 2026-08-19
 
 ### Added
