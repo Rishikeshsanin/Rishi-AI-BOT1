@@ -1,9 +1,29 @@
 import * as webllm from "@mlc-ai/web-llm";
 import "./style.css";
 
-const MODEL_ID = "Qwen3-1.7B-q4f16_1-MLC";
 const STORAGE_KEY = "rishi-ai-bot1-chat-v1";
 const SYSTEM_PROMPT = "You are Rishi AI BOT1, a helpful, concise, friendly local AI assistant. Give clear answers, use structure when useful, and be transparent when unsure.";
+
+const MODEL_PROFILES = {
+  qwen17f16: {
+    id: "Qwen3-1.7B-q4f16_1-MLC",
+    name: "Qwen3 1.7B",
+    quant: "q4f16",
+    vram: "~2.0 GB",
+  },
+  qwen06f16: {
+    id: "Qwen3-0.6B-q4f16_1-MLC",
+    name: "Qwen3 0.6B",
+    quant: "q4f16",
+    vram: "~1.4 GB",
+  },
+  qwen06f32: {
+    id: "Qwen3-0.6B-q4f32_1-MLC",
+    name: "Qwen3 0.6B",
+    quant: "q4f32",
+    vram: "~1.9 GB",
+  },
+};
 
 const $ = (selector) => document.querySelector(selector);
 const chat = $("#chat");
@@ -24,9 +44,14 @@ const stopButton = $("#stop-button");
 const newChatButton = $("#new-chat");
 const thinkingToggle = $("#thinking-toggle");
 const toast = $("#toast");
+const modelTitle = $("#model-title");
+const modelMeta = $("#model-meta");
+const modelVram = $("#model-vram");
 
 let engine = null;
 let worker = null;
+let adapter = null;
+let activeProfile = null;
 let loading = false;
 let generating = false;
 let toastTimer;
@@ -56,7 +81,19 @@ function notify(text) {
   toast.textContent = text;
   toast.classList.add("show");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => toast.classList.remove("show"), 3200);
+  toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
+}
+
+function shortError(error) {
+  const raw = error?.message || error?.toString?.() || "Unknown model initialization error";
+  return String(raw).replace(/\s+/g, " ").trim().slice(0, 190);
+}
+
+function updateModelCard(profile, suffix = "") {
+  if (!profile) return;
+  if (modelTitle) modelTitle.textContent = profile.name;
+  if (modelMeta) modelMeta.textContent = `WebLLM · ${profile.quant} · WebGPU${suffix ? ` · ${suffix}` : ""}`;
+  if (modelVram) modelVram.textContent = profile.vram;
 }
 
 function escapeHtml(text) {
@@ -168,10 +205,15 @@ async function webGpuReady() {
     setStatus("error", "WebGPU unavailable");
     return false;
   }
+
   try {
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) throw new Error("No WebGPU adapter");
-    deviceIndicator.textContent = "WebGPU ready · model runs on this device";
+    adapter = adapter || await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    if (!adapter) throw new Error("No compatible WebGPU adapter");
+
+    const hasF16 = adapter.features?.has?.("shader-f16");
+    deviceIndicator.textContent = hasF16
+      ? "WebGPU ready · shader-f16 available · adaptive model loading enabled"
+      : "WebGPU ready · compatibility precision will be used";
     deviceIndicator.style.color = "#5f9f8b";
     return true;
   } catch (error) {
@@ -184,45 +226,97 @@ async function webGpuReady() {
   }
 }
 
-async function loadModel() {
-  if (engine || loading || !(await webGpuReady())) return;
-  loading = true;
-  loadButton.disabled = true;
-  loadButtonLabel.textContent = "Loading model…";
-  progressWrap.classList.remove("hidden");
-  setStatus("loading", "Loading Qwen3");
+function candidateProfiles() {
+  const hasF16 = adapter?.features?.has?.("shader-f16");
+  if (hasF16) {
+    return [MODEL_PROFILES.qwen17f16, MODEL_PROFILES.qwen06f16];
+  }
+  return [MODEL_PROFILES.qwen06f32];
+}
+
+function resetWorker() {
+  try { worker?.terminate(); } catch { /* no-op */ }
+  worker = null;
+  engine = null;
+}
+
+async function initializeProfile(profile, attemptIndex, totalAttempts) {
+  updateModelCard(profile, attemptIndex > 0 ? "compatibility fallback" : "preferred");
+  progressBar.style.width = "0%";
+  progressPercent.textContent = "0%";
+  progressText.textContent = attemptIndex > 0
+    ? `Trying lighter fallback: ${profile.name}…`
+    : `Preparing ${profile.name}…`;
+  loadButtonLabel.textContent = attemptIndex > 0 ? "Loading fallback…" : "Loading model…";
+  setStatus("loading", `Loading ${profile.name}`);
+
+  worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
 
   try {
-    worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module" });
-    engine = await webllm.CreateWebWorkerMLCEngine(worker, MODEL_ID, {
+    const createdEngine = await webllm.CreateWebWorkerMLCEngine(worker, profile.id, {
       initProgressCallback: (report) => {
         const progress = Number.isFinite(report.progress) ? Math.max(0, Math.min(1, report.progress)) : 0;
         const pct = Math.round(progress * 100);
         progressBar.style.width = `${pct}%`;
         progressPercent.textContent = `${pct}%`;
-        progressText.textContent = report.text || "Preparing Qwen3…";
+        progressText.textContent = report.text || `Preparing ${profile.name}…`;
       },
     });
-    progressBar.style.width = "100%";
-    progressPercent.textContent = "100%";
-    progressText.textContent = "Qwen3 is ready on your device";
-    loadButtonLabel.textContent = "Model loaded";
-    setStatus("ready", "Qwen3 ready");
-    setChatEnabled(true);
-    notify("Rishi AI is ready. Inference now runs on your device.");
+    return createdEngine;
   } catch (error) {
-    console.error(error);
-    engine = null;
-    worker?.terminate();
-    worker = null;
-    loadButton.disabled = false;
-    loadButtonLabel.textContent = "Retry loading AI";
-    progressText.textContent = "Could not load the model";
-    setStatus("error", "Model load failed");
-    notify("Model load failed. Check WebGPU support and available GPU memory.");
-  } finally {
-    loading = false;
+    console.error(`${profile.id} failed`, error);
+    resetWorker();
+    if (attemptIndex < totalAttempts - 1) {
+      progressBar.style.width = "0%";
+      progressPercent.textContent = "0%";
+      progressText.textContent = `${profile.name} could not initialize. Switching to a lighter Qwen3 model…`;
+      notify(`${profile.name} was too demanding or incompatible. Trying a lighter Qwen3 model automatically.`);
+      await new Promise((resolve) => setTimeout(resolve, 650));
+    }
+    throw error;
   }
+}
+
+async function loadModel() {
+  if (engine || loading || !(await webGpuReady())) return;
+
+  loading = true;
+  loadButton.disabled = true;
+  progressWrap.classList.remove("hidden");
+  let lastError = null;
+
+  const profiles = candidateProfiles();
+
+  for (let i = 0; i < profiles.length; i += 1) {
+    const profile = profiles[i];
+    try {
+      engine = await initializeProfile(profile, i, profiles.length);
+      activeProfile = profile;
+      progressBar.style.width = "100%";
+      progressPercent.textContent = "100%";
+      progressText.textContent = `${profile.name} is ready on your device`;
+      loadButtonLabel.textContent = `${profile.name} loaded`;
+      setStatus("ready", `${profile.name} ready`);
+      updateModelCard(profile, i > 0 ? "fallback active" : "active");
+      setChatEnabled(true);
+      notify(`${profile.name} is ready. Inference runs on your device.`);
+      loading = false;
+      return;
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  loadButton.disabled = false;
+  loadButtonLabel.textContent = "Retry loading AI";
+  progressBar.style.width = "100%";
+  progressPercent.textContent = "Failed";
+  progressText.textContent = `Model initialization failed: ${shortError(lastError)}`;
+  setStatus("error", "Model load failed");
+  deviceIndicator.textContent = "WebGPU exists, but this device/browser could not initialize the available Qwen3 profiles";
+  deviceIndicator.style.color = "#fb7185";
+  notify("The browser GPU could not initialize Qwen3. Try Chrome/Edge, close GPU-heavy apps, or use the Windows offline build.");
+  loading = false;
 }
 
 function requestHistory() {
@@ -259,7 +353,7 @@ async function generate(text) {
       messages: requestHistory(),
       temperature: thinking ? 0.6 : 0.7,
       top_p: thinking ? 0.95 : 0.8,
-      max_tokens: thinking ? 768 : 512,
+      max_tokens: activeProfile?.name === "Qwen3 0.6B" ? (thinking ? 512 : 384) : (thinking ? 768 : 512),
       extra_body: { enable_thinking: thinking },
     };
 
@@ -282,7 +376,7 @@ async function generate(text) {
     generating = false;
     stopButton.classList.add("hidden");
     sendButton.disabled = false;
-    setStatus("ready", "Qwen3 ready");
+    setStatus("ready", `${activeProfile?.name || "Qwen3"} ready`);
     promptInput.focus();
     scrollBottom();
   }
