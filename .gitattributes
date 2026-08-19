@@ -1,0 +1,8 @@
+# Keep Windows launcher files in CRLF format
+*.bat text eol=crlf
+
+# Keep documentation and config files in LF format
+*.md text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
